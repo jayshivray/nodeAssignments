@@ -32,35 +32,23 @@ let keywordHider = {
       {        
         if(node.getAttribute('alt')!=''){
           if(this.isWordFind(this.keyword,node.getAttribute('alt'))){                        
+            
+            node.classList.add('bImage');
             // node.src = 'http://www.microworldsystems.com/download/tools/escan.png';
             // node.style.display = 'none';
+            /*
             let pNone  = node.parentNode,            
                 height = node.offsetHeight,            
                 width  = node.offsetWidth;
-                        
-            let div = document.createElement('div');
-            let style = 'position:relative;width:'+width+'px;height:'+height+'px';                 
-                div.setAttribute('style',style);                
-                pNone.appendChild(div); 
-        
-            let div2    = document.createElement('div'),
-                style2  = 'position:absolute;width:'+width+'px;height:'+height+'display:none;color:#FFF;display:block;background:#ff0000;';                
-                div2.setAttribute('style',style2);
-
-                div.appendChild(node);          
-                div.appendChild(div2); 
+                console.log(`height ${height} width: ${width}`);*/           
           } 
           else if(this.isWordFind(this.keyword,node.getAttribute('src'))){            
+            node.classList.add('bImage');            
             // node.src = 'http://www.microworldsystems.com/download/tools/escan.png';
             // node.style.display = 'none';
           }          
         }                 
-      }      
-      /*let div = document.createElement('div');        
-        let styleStr = 'position:fixed;top:0;left:0;right:0;'+
-                       'bottom:0;background-color:rgba(0,0,0,0.5);z-index:2;cursor:pointer;';        
-        div.setAttribute('style',styleStr);        
-        div.appendChild(node);*/        
+      }             
     }; 
   },
   blockVideos : function(){
