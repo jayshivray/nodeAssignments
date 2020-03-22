@@ -7,6 +7,7 @@ let keywordHider = {
   breakRegExp : new RegExp('[^\\w\'-]+', "g"),
   matchRegExp : "",
   hidewords   : 'false',
+  styletag    : '',
 
   createRegex : function(word){
     word = word.replace(this.endRegExp, "");
@@ -28,31 +29,35 @@ let keywordHider = {
       }       
     }                 
     if(node.nodeType == 1) {// NODE_TEXT			
-      if(node.tagName=='IMG')
-      {        
-        if(node.getAttribute('alt')!=''){
-          if(this.isWordFind(this.keyword,node.getAttribute('alt'))){                        
-            
-            node.classList.add('bImage');
-            // node.src = 'http://www.microworldsystems.com/download/tools/escan.png';
-            // node.style.display = 'none';
-            /*
-            let pNone  = node.parentNode,            
-                height = node.offsetHeight,            
-                width  = node.offsetWidth;
-                console.log(`height ${height} width: ${width}`);*/           
+      if(node.tagName=='IMG'){
+        if (this.keyword=='*'){//block all images
+          keywordHider.styletag.textContent = 'img {opacity: 0 !important;}* {background-image: none !important;}'; 
+        }else{
+          if(node.getAttribute('alt')!=''){
+            if(this.isWordFind(this.keyword,node.getAttribute('alt'))){                                                
+              node.classList.add('bImage');         
+            } 
+            else if(this.isWordFind(this.keyword,node.getAttribute('src'))){                        
+              node.classList.add('bImage');                                  
+            }          
           } 
-          else if(this.isWordFind(this.keyword,node.getAttribute('src'))){            
-            node.classList.add('bImage');            
-            // node.src = 'http://www.microworldsystems.com/download/tools/escan.png';
-            // node.style.display = 'none';
-          }          
-        }                 
+        }                                 
       }             
     }; 
   },
-  blockVideos : function(){
-
+  blockVideos : function(node){
+    if(node.hasChildNodes()) {
+      for(var i=0; i < node.childNodes.length; i++){
+        console.log('ele',node.childNodes[i]);
+        this.blockImages(node.childNodes[i]);
+      }       
+    }                 
+    if(node.nodeType == 1) {// NODE_TEXT			
+      if(node.tagName=='IMG')
+      {        
+        console.log('image');                
+      }             
+    };
   },
   blockYoutubeVideos : function(node){
 
@@ -114,18 +119,29 @@ let keywordHider = {
 const callback = function(mutationsList, observer) {
   keywordHider.hiliteColor = '#ffff00';
   keywordHider.fontColor   = '#000000'; 
-  keywordHider.hidewords   = false; 
-  keywordHider.keyword     = 'java'; 
+  keywordHider.hidewords   = false;   
+  keywordHider.keyword     = '*'; 
   keywordHider.createRegex(keywordHider.keyword);  
-  //keywordHider.findTextNode(document.querySelector("html"));    
-  keywordHider.blockImages(document.querySelector("html"));    
-  // keywordHider.blockAdds(document.querySelector("html"));    
+  
+  if (keywordHider.keyword=='*')
+  {
+    let styletag = document.createElement('style');  
+    keywordHider.styletag = styletag;
+    document.head.appendChild(keywordHider.styletag);
+  } 
+  //keywordHider.blockImages(document.querySelector('html'));  
+  keywordHider.blockImages(document.querySelector('html'));  
+  observer.disconnect();
 };
-const targetNode  = document.querySelector('html'); // Select the node that will be observed for mutations
-const config      = { attributes: true, childList: true, subtree: true };// Options for the observer (which mutations to observe)
-const observer    = new MutationObserver(callback); // Create an observer instance linked to the callback function
-observer.observe(targetNode, config);               // Start observing the target node for configured mutations
-// observer.disconnect();// Later, you can stop observing
+const setMutationObserver = function()
+{
+  const targetNode  = document.querySelector('html'); // Select the node that will be observed for mutations  
+  const config      = { attributes: true, childList: true, subtree: true };// Options for the observer (which mutations to observe)
+        observer    = new MutationObserver(callback); // Create an observer instance linked to the callback function
+  observer.observe(targetNode, config);               // Start observing the target node for configured mutations    
+} 
+var   observer;
+setMutationObserver();
 
 /*
   for specific url : "*://*.mozilla.org/*",
@@ -144,5 +160,12 @@ observer.observe(targetNode, config);               // Start observing the targe
                     hilite words.
                     this function require textnode object of any element. 
   3] hideVideos   : for hiding videos
-  4] dislayBlock  : it will display block page on whole html document                    
+  4] dislayBlock  : it will display block page on whole html document        
+  https://github.com/tiborbarsi/image-video-block-browser-addon     
+
+  get current element width and height
+  let pNone  = node.parentNode,            
+      height = node.offsetHeight,            
+      width  = node.offsetWidth;
+      console.log(`height ${height} width: ${width}`);  
 */
